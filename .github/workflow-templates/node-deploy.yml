@@ -1,0 +1,29 @@
+name: Reusable Node.js Deploy
+
+on:
+  workflow_call:
+    inputs:
+      app_production:
+        required: true
+        type: string
+      app_staging:
+        required: true
+        type: string
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Restart app (Production)
+        if: github.ref == 'refs/heads/main'
+        run: pm2 restart ${{ inputs.app_production }}
+
+      - name: Restart app (Staging)
+        if: github.ref == 'refs/heads/staging'
+        run: pm2 restart ${{ inputs.app_staging }}
